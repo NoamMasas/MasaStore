@@ -67,13 +67,19 @@ pip install -r requirements.txt
 
 ### 2. Configure environment
 
-Create a `.env` in the project root (or export the variables in your shell):
+Set your OpenAI key either via a `.env` file at the project root (auto-loaded by Pydantic Settings) or as a shell variable:
 
 ```env
+# .env
 OPENAI_API_KEY=your-openai-api-key-here
 ```
 
-All other settings (DB URL, Redis host, JWT secret) have sensible defaults in `config/config.py`.
+```powershell
+# PowerShell alternative
+$env:OPENAI_API_KEY = "your-openai-api-key-here"
+```
+
+All other settings (DB URL, Redis host, JWT secret) have sensible defaults in `config/config.py`. A real shell variable overrides the `.env`.
 
 ### 3. Start MySQL and Redis
 
@@ -163,9 +169,13 @@ The notebook originally used a Keras ANN via `scikeras.KerasClassifier`, but sci
 
 ### Reported metrics on synthetic test set
 
-Actual metrics are stored in the joblib bundle (`bundle["metrics"]`) and printed at the end of the notebook. Random baseline is `1/30 ≈ 3.3%` for top-1.
+| Metric | Value | Random baseline |
+|---|---|---|
+| Top-1 accuracy | 16.5% | 3.3% |
+| Top-3 accuracy | 37.9% | 10% |
+| Top-5 accuracy | 52.6% | 16.7% |
 
-The spending personas (Saver / Average / Spender) provide intra-category signal: within a category, items are weighted by `1 / price^alpha`, so a Saver-leaning user's signal points at the cheaper Tech items (Wireless Mouse, Bluetooth Speaker) rather than the expensive ones (Tablet, Laptop). The "For You" sort in the UI surfaces this category-then-price ordering directly.
+Top-1 is ~5× random and top-3 is ~3.8× random — the spending personas (Saver / Average / Spender) provide the intra-category signal. Within a category, items are weighted by `1 / price^alpha`, so a Saver-leaning user's signal points at the cheaper Tech items (Wireless Mouse, Bluetooth Speaker) rather than the expensive ones (Tablet, Laptop). The "For You" sort in the UI surfaces this category-then-price ordering directly.
 
 ### How it's wired
 
@@ -198,8 +208,10 @@ MasaStore_web/
 ├── exceptions/                # HTTPException factories
 ├── redisClient/               # Redis client singleton
 ├── resources/
-│   └── db-migrations/
-│       └── init.sql           # Schema + seed (30 items, 3 users, demo orders)
+│   ├── db-migrations/
+│   │   └── init.sql           # Schema + seed (30 items, 3 users, demo orders)
+│   └── prompts/
+│       └── chat_system.txt    # OpenAI chat system prompt (loaded by chat_service)
 ├── ml/
 │   ├── recommender.joblib     # Trained RandomForest pipeline + metadata
 │   └── notebooks/
@@ -220,6 +232,7 @@ MasaStore_web/
 
 - **Single TEMP order per user** — enforced at the service layer (`order_service._get_or_create_temp_order`), not via a DB constraint.
 - **Stock decrement is atomic** — `UPDATE item SET stock = stock - :qty WHERE id = :id AND stock >= :qty`; rowcount=0 rolls back the entire purchase transaction.
+- **Price snapshot** — TEMP orders display the live catalog price (each per-line total adds up to the displayed grand total). On purchase, `order_item.price` is snapshotted from `item.price` so CLOSE orders preserve the original transaction value even if the catalog changes later.
 - **Catalog cache** — Redis caches the full item list; busted on purchase (stock changes).
-- **Recommendation cache** — Redis caches the per-user top-30 ranking; busted on any favorite/cart/purchase mutation.
+- **Recommendation cache** — Redis caches the per-user ranking; busted on any favorite/cart/purchase mutation.
 - **Country constraint** — `model/user_request.py` uses `Literal` for the 10 ISO codes the recommender was trained on; the UI signup form mirrors them in a `selectbox`.
