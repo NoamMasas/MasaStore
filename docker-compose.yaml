@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      - TZ=Asia/Jerusalem
+      - MYSQL_DATABASE=main
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./resources/db-migrations:/docker-entrypoint-initdb.d/
+    command: --default-authentication-plugin=mysql_native_password
+  redis:
+    container_name: "redis_docker"
+    image: redis:latest
+    ports:
+      - "6379:6379"
+volumes:
+  mysql-data:

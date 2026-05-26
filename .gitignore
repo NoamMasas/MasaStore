@@ -1,0 +1,58 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# ---- Virtual environment ----
+.venv/
+venv/
+env/
+ENV/
+
+# ---- Distribution / packaging ----
+build/
+dist/
+*.egg-info/
+*.egg
+
+# ---- IDE / editor ----
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Streamlit ----
+.streamlit/secrets.toml
+
+# ---- Environment variables / secrets ----
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+
+# ---- Claude / dev tools ----
+.claude/
+
+# ---- ML artifacts (keep the .joblib for grading; uncomment to exclude) ----
+# ml/recommender.joblib
+
+# ---- DB / cache local data ----
+*.sqlite
+*.db
+dump.rdb
