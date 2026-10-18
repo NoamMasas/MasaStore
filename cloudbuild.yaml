@@ -1,0 +1,27 @@
+# Builds the three images and pushes them to Artifact Registry.
+# Run via: deploy/deploy.sh build
+substitutions:
+  _REGION: us-central1
+  _REPO: masastore
+  _TAG: latest
+
+steps:
+  - id: app
+    name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/app:${_TAG}", "."]
+  - id: db
+    name: gcr.io/cloud-builders/docker
+    waitFor: ["-"]
+    args: ["build", "-f", "deploy/db/Dockerfile", "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/db:${_TAG}", "."]
+  - id: redis
+    name: gcr.io/cloud-builders/docker
+    waitFor: ["-"]
+    args: ["build", "-f", "deploy/redis/Dockerfile", "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/redis:${_TAG}", "deploy/redis"]
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/app:${_TAG}
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/db:${_TAG}
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/redis:${_TAG}
+
+options:
+  logging: CLOUD_LOGGING_ONLY

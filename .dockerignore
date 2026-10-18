@@ -1,0 +1,23 @@
+# Secrets never enter the image; they come from Secret Manager at runtime.
+.env
+.env.*
+
+.git/
+.venv/
+venv/
+.idea/
+.vscode/
+.claude/
+__pycache__/
+*.py[cod]
+
+ml/notebooks/
+deploy/
+!deploy/db/low-memory.cnf
+docs/
+*.md
+docker-compose.yaml
+Dockerfile
+.dockerignore
+.gcloudignore
+cloudbuild.yaml

@@ -40,5 +40,12 @@ def increment_counter(key: str) -> int:
     return redis_client.incr(key)
 
 
+def increment_counter_with_ttl(key: str, ttl_seconds: int) -> int:
+    value = redis_client.incr(key)
+    if value == 1:
+        redis_client.expire(key, ttl_seconds)
+    return value
+
+
 def reset_counter(key: str):
     redis_client.delete(key)

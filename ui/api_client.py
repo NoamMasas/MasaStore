@@ -1,8 +1,9 @@
+import os
 from functools import wraps
 
 import requests
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 
 class APIError(Exception):

@@ -58,6 +58,8 @@ if st.session_state.prompts_left > 0:
         except APIError as e:
             if e.is_auth_expired():
                 handle_session_expired()
+            elif e.is_rate_limited() and e.message.startswith("Daily"):
+                st.warning(f"⚠️ {e.message}")
             elif e.is_rate_limited():
                 st.warning(
                     "⚠️ You've reached the 5-message limit. "

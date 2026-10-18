@@ -93,6 +93,13 @@ def session_limit_exception():
     )
 
 
+def daily_chat_limit_exception():
+    return HTTPException(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        detail="Daily chat limit reached. Please try again tomorrow.",
+    )
+
+
 def token_exception():
     return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

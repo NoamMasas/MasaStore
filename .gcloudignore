@@ -1,0 +1,15 @@
+# Files NOT uploaded to Cloud Build (`gcloud builds submit`).
+.gcloudignore
+.git/
+.gitignore
+.env
+.env.*
+.venv/
+venv/
+.idea/
+.vscode/
+.claude/
+__pycache__/
+*.py[cod]
+ml/notebooks/
+pre_submission_checklist.md
